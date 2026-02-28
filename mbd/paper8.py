@@ -800,7 +800,7 @@ def describe() -> dict:
         "author": "Brandon Everett",
         "orcid": "0000-0001-7521-5469",
         "series": "Memory as Baseline Deviation — Computational Labs",
-        "status": "STRUCTURAL SCHEMATIC — staged on feat/paper-7/endemic-baseline",
+        "status": "v1.0.0 — published 2026-02-27",
         "depends_on": [
             "Paper 7: The Endemic Baseline",
             "Paper 4: Coupling Asymmetry",
