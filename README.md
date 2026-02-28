@@ -130,5 +130,5 @@ python -c "from mbd.paper8 import aleph; print(aleph())"
 
 ## License
 
-MIT — see [LICENSE](LICENSE).  
+Apache-2.0 — see [LICENSE](LICENSE).  
 The Aleph-n fragments (checkpoints) are additionally released into the public domain: mathematical statements have no author. They are true or false independent of who wrote them.
