@@ -1,0 +1,6 @@
+# Core
+numpy>=1.24
+matplotlib>=3.7
+
+# Labs (optional)
+scipy>=1.10

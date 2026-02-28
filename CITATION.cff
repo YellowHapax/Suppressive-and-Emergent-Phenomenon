@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use this paper or software, please cite it as below."
+type: software
+title: "The Suppressive and Emergent Phenomenon (Paper 8 — MBD Series)"
+abstract: >
+  Paper 8 of the Memory as Baseline Deviation series.
+  H (the Horizon) is a manipulable control surface. An adversarial agent
+  that controls which states a population occupies can engineer endemic
+  baselines at scale using four vectors: Isolation, Episodic Erasure,
+  Storm Normalization, and kappa-Suppression. Formalizes detection
+  signatures, the critical coupling threshold kappa_c, and the Recursive
+  Immunity Theorem. Implemented as executable Python: the paper docstring
+  IS the abstract; the data structures ARE the formal claims.
+authors:
+  - family-names: Everett
+    given-names: Brandon
+    orcid: "https://orcid.org/0000-0001-7521-5469"
+version: "0.8.0"
+date-released: "2026-02-27"
+license: MIT
+repository-code: "https://github.com/YellowHapax/Suppressive-and-Emergent-Phenomenon"
+url: "https://doi.org/10.5281/zenodo.18652919"
+keywords:
+  - "memory as baseline deviation"
+  - "endemic baseline"
+  - "adversarial horizon engineering"
+  - "kappa coupling"
+  - "recursive immunity"
+  - "Lenia property"
+  - "cognitive psychology"
+  - "computational social science"
+references:
+  - type: software
+    title: "MBD Framework (Papers 1–7)"
+    authors:
+      - family-names: Everett
+        given-names: Brandon
+        orcid: "https://orcid.org/0000-0001-7521-5469"
+    repository-code: "https://github.com/YellowHapax/MBD-Framework"
+    doi: "10.5281/zenodo.18652919"

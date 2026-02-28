@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "suppressive-and-emergent-phenomenon"
+version = "0.8.0"
+description = (
+    "Paper 8 of the MBD Framework: H as a Control Surface — "
+    "Adversarial Horizon Engineering and the Recursive Structure of "
+    "Resistance. The paper and its computational proofs as a Python package."
+)
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Brandon Everett", email = "brandon.everett@orcid.org" }
+]
+keywords = [
+    "adversarial",
+    "horizon engineering",
+    "endemic baseline",
+    "kappa coupling",
+    "memory baseline deviation",
+    "MBD",
+    "suppression",
+    "recursive immunity",
+    "Lenia property",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+]
+
+[project.optional-dependencies]
+labs = [
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "scipy>=1.10",
+]
+all = ["suppressive-and-emergent-phenomenon[labs]"]
+
+[project.urls]
+Homepage        = "https://github.com/YellowHapax/Suppressive-and-Emergent-Phenomenon"
+Repository      = "https://github.com/YellowHapax/Suppressive-and-Emergent-Phenomenon"
+"MBD Framework" = "https://github.com/YellowHapax/MBD-Framework"
+"DOI (Zenodo)"  = "https://doi.org/10.5281/zenodo.18652919"
+"Software Heritage" = "https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/YellowHapax/Suppressive-and-Emergent-Phenomenon"
+"Bug Tracker"   = "https://github.com/YellowHapax/Suppressive-and-Emergent-Phenomenon/issues"
+
+[tool.setuptools.packages.find]
+include = ["mbd*", "labs*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.txt"]
