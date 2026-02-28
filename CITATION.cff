@@ -15,9 +15,9 @@ authors:
   - family-names: Everett
     given-names: Brandon
     orcid: "https://orcid.org/0000-0001-7521-5469"
-version: "0.8.0"
+version: "1.0.0"
 date-released: "2026-02-27"
-license: MIT
+license: Apache-2.0
 repository-code: "https://github.com/YellowHapax/Suppressive-and-Emergent-Phenomenon"
 url: "https://doi.org/10.5281/zenodo.18652919"
 keywords:
