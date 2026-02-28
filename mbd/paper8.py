@@ -141,6 +141,18 @@ class LabSchemaError(RuntimeError):
 # Canonical lab registry: canonical_id -> (module_path, display_name)
 # Add entries here as labs are implemented. Aliases map to canonical IDs.
 _LABS: dict[str, tuple[str, str]] = {
+    "8.1": (
+        "labs.paper8_adversarial_horizon.phenomena_adversarial_horizon",
+        "phenomena_adversarial_horizon",
+    ),
+    "8.2": (
+        "labs.paper8_adversarial_horizon.phenomena_kappa_collapse",
+        "phenomena_kappa_collapse",
+    ),
+    "8.3": (
+        "labs.paper8_adversarial_horizon.phenomena_detection_signatures",
+        "phenomena_detection_signatures",
+    ),
     "8.4": (
         "labs.paper8_adversarial_horizon.phenomena_recursive_immunity",
         "phenomena_recursive_immunity",
@@ -148,6 +160,9 @@ _LABS: dict[str, tuple[str, str]] = {
 }
 # Alias -> canonical_id. run_labs(lab=None) iterates _LABS only (no duplicates).
 _LAB_ALIASES: dict[str, str] = {
+    "adversarial_horizon": "8.1",
+    "kappa_collapse": "8.2",
+    "detection_signatures": "8.3",
     "recursive_immunity": "8.4",
 }
 
@@ -166,9 +181,22 @@ def _lab_result_from_raw(lab_id: str, lab_name: str, raw: object) -> LabResult:
     """Coerce mod.run() output into a typed LabResult.
 
     Extracts known fields from the raw dict; unknown keys are preserved
-    in LabResult.raw. Raises LabSchemaError if raw is not a dict, so
-    callers can distinguish a broken lab schema from a missing lab.
+    in LabResult.raw. Raises LabSchemaError if raw cannot be coerced to a
+    dict, so callers can distinguish a broken lab schema from a missing lab.
     """
+    if not isinstance(raw, dict):
+        # Auto-coerce dataclasses and objects with __dict__ (labs 8.1–8.3
+        # return their own typed LabResult dataclasses; the paper-level
+        # wrapper is agnostic to those types).
+        import dataclasses as _dc
+        if _dc.is_dataclass(raw) and not isinstance(raw, type):
+            raw = _dc.asdict(raw)  # type: ignore[arg-type]
+        elif hasattr(raw, "__dict__"):
+            raw = vars(raw)  # type: ignore[assignment]
+        else:
+            raise LabSchemaError(
+                f"Lab '{lab_id}' run() must return dict, got {type(raw).__name__}"
+            )
     if not isinstance(raw, dict):
         raise LabSchemaError(
             f"Lab '{lab_id}' run() must return dict, got {type(raw).__name__}"
@@ -825,9 +853,9 @@ def describe() -> dict:
         "aleph_checkpoints": len(ALEPH),
         "attack_vectors": len(VECTORS),
         "labs": [
-            "Lab 8.1 — phenomena_adversarial_horizon (spec)",
-            "Lab 8.2 — phenomena_kappa_collapse (spec)",
-            "Lab 8.3 — phenomena_detection_signatures (spec)",
+            "Lab 8.1 — phenomena_adversarial_horizon (implemented)",
+            "Lab 8.2 — phenomena_kappa_collapse (implemented)",
+            "Lab 8.3 — phenomena_detection_signatures (implemented)",
             "Lab 8.4 — phenomena_recursive_immunity (implemented)",
         ],
         "lenia_property": (
