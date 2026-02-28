@@ -97,8 +97,70 @@ DOI (Zenodo): https://doi.org/10.5281/zenodo.18652919
 
 from __future__ import annotations
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Any, Optional
 import textwrap
+
+
+# ---------------------------------------------------------------------------
+# Lab result schema — enforced contract between run_labs() and callers.
+# ---------------------------------------------------------------------------
+
+@dataclass
+class LabResult:
+    """Typed return value from a Paper 8 computational lab.
+
+    Two-channel incommensurability (Lab 8.4) is expressed as two named
+    fields rather than a single scalar — matching the formal claim in §8
+    and §11/Q5 that E_content and E_suppression must not be aggregated.
+    """
+    lab_id: str                         # e.g. "8.4"
+    lab_name: str                       # e.g. "phenomena_recursive_immunity"
+    raw: dict[str, Any]                 # full dict from mod.run()
+
+    # Lab 8.4 primary outputs (None for labs that don't produce them)
+    e_content_curves: Optional[list] = field(default=None)
+    e_suppression_curves: Optional[list] = field(default=None)
+    obs_floor_values: Optional[list] = field(default=None)
+    peak_map: Optional[list] = field(default=None)
+    cascade_analysis: Optional[list] = field(default=None)
+    summary_by_theta: Optional[dict] = field(default=None)
+    finding: Optional[str] = field(default=None)
+
+    # Future labs (populated by labs 8.1–8.3 when implemented)
+    horizon_growth_curve: Optional[list] = field(default=None)    # Lab 8.1
+    kappa_phase_transition: Optional[dict] = field(default=None)  # Lab 8.2
+    detection_classifier: Optional[dict] = field(default=None)    # Lab 8.3
+
+
+def _lab_result_from_raw(lab_id: str, lab_name: str, raw: dict) -> LabResult:
+    """Coerce mod.run() output into a typed LabResult.
+
+    Extracts known fields from the raw dict; unknown keys are preserved
+    in LabResult.raw. Raises TypeError if raw is not a dict.
+    """
+    if not isinstance(raw, dict):
+        raise TypeError(
+            f"Lab '{lab_id}' run() must return dict, got {type(raw).__name__}"
+        )
+    curves = raw.get("curves", [])
+    return LabResult(
+        lab_id=lab_id,
+        lab_name=lab_name,
+        raw=raw,
+        e_content_curves=(
+            [c["e_content_curve"] for c in curves if "e_content_curve" in c]
+            or None
+        ),
+        e_suppression_curves=(
+            [c["e_suppression_curve"] for c in curves if "e_suppression_curve" in c]
+            or None
+        ),
+        obs_floor_values=raw.get("params", {}).get("obs_floor_values"),
+        peak_map=raw.get("peak_map"),
+        cascade_analysis=raw.get("cascade_analysis"),
+        summary_by_theta=raw.get("summary_by_theta"),
+        finding=raw.get("summary", {}).get("finding"),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -467,6 +529,15 @@ def describe() -> dict:
             "https://archive.softwareheritage.org/browse/origin/"
             "?origin_url=https://github.com/YellowHapax/MBD-Framework"
         ),
+        "license": {
+            "code": "Apache-2.0",
+            "aleph_checkpoints": "CC0-1.0",
+            "note": (
+                "The Aleph-n checkpoint texts are dedicated to the public domain "
+                "under CC0-1.0 and may be reproduced without attribution. "
+                "All other code and prose is Apache-2.0."
+            ),
+        },
         "kernel_axioms": len(KERNEL),
         "aleph_checkpoints": len(ALEPH),
         "attack_vectors": len(VECTORS),
@@ -487,7 +558,7 @@ def describe() -> dict:
 def run_labs(
     lab: Optional[str] = None,
     plot: bool = False,
-) -> Optional[dict]:
+) -> Optional[dict[str, LabResult]]:
     """Run the implemented computational labs for Paper 8.
 
     Parameters
@@ -500,26 +571,35 @@ def run_labs(
 
     Returns
     -------
-    dict or None
-        The lab's return value (simulation results), or None if not
-        implemented yet.
+    dict[str, LabResult] or None
+        Keys are lab identifiers (e.g. "8.4"). Values are typed
+        LabResult objects with named fields for each channel's output.
+        Returns None if no labs ran successfully.
 
     Notes
     -----
     Labs 8.1–8.3 are currently spec-only. Lab 8.4 is fully implemented.
+    The two-channel incommensurability claim (E_content / E_suppression)
+    is enforced in the LabResult schema: they are separate named fields
+    and are never summed into a single scalar.
     """
-    import importlib, sys
+    import importlib
 
-    implemented = {
-        "8.4": "labs.paper8_adversarial_horizon.phenomena_recursive_immunity",
+    # canonical lab_id -> (module_path, display_name)
+    implemented: dict[str, tuple[str, str]] = {
+        "8.4": (
+            "labs.paper8_adversarial_horizon.phenomena_recursive_immunity",
+            "phenomena_recursive_immunity",
+        ),
         "recursive_immunity": (
-            "labs.paper8_adversarial_horizon.phenomena_recursive_immunity"
+            "labs.paper8_adversarial_horizon.phenomena_recursive_immunity",
+            "phenomena_recursive_immunity",
         ),
     }
 
     targets = list(implemented.keys()) if lab is None else [lab]
     seen: set[str] = set()
-    results = {}
+    results: dict[str, LabResult] = {}
 
     for key in targets:
         if key not in implemented:
@@ -528,20 +608,22 @@ def run_labs(
                 f"Available: {list(implemented.keys())}"
             )
             continue
-        mod_path = implemented[key]
+        mod_path, lab_name = implemented[key]
         if mod_path in seen:
             continue
         seen.add(mod_path)
 
         try:
             mod = importlib.import_module(mod_path)
-            result = mod.run()
+            raw = mod.run()
+            lab_result = _lab_result_from_raw(key, lab_name, raw)
             if plot and hasattr(mod, "plot"):
-                mod.plot(result)
-            results[key] = result
+                mod.plot(raw)
+            results[key] = lab_result
         except ImportError as exc:
             print(f"[mbd.paper8] Could not import {mod_path}: {exc}")
-            results[key] = None
+        except TypeError as exc:
+            print(f"[mbd.paper8] Lab '{key}' returned invalid schema: {exc}")
 
     return results if results else None
 
@@ -587,10 +669,8 @@ if __name__ == "__main__":
     import io
 
     # Ensure Unicode math symbols (λ, κ, ⊂, …) survive Windows cp1252 console.
-    if hasattr(sys.stdout, "buffer"):
-        sys.stdout = io.TextIOWrapper(
-            sys.stdout.buffer, encoding="utf-8", errors="replace"
-        )
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
     args = sys.argv[1:]
 
