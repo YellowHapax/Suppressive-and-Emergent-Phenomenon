@@ -113,7 +113,7 @@ class LabResult:
     fields rather than a single scalar — matching the formal claim in §8
     and §11/Q5 that E_content and E_suppression must not be aggregated.
     """
-    lab_id: str                         # e.g. "8.4"
+    lab_id: str                         # canonical id, e.g. "8.4"
     lab_name: str                       # e.g. "phenomena_recursive_immunity"
     raw: dict[str, Any]                 # full dict from mod.run()
 
@@ -132,14 +132,45 @@ class LabResult:
     detection_classifier: Optional[dict] = field(default=None)    # Lab 8.3
 
 
-def _lab_result_from_raw(lab_id: str, lab_name: str, raw: dict) -> LabResult:
+class LabSchemaError(RuntimeError):
+    """Raised when a lab's run() returns a value that cannot be coerced
+    into a LabResult. Distinct from ImportError (lab not available) so
+    callers can distinguish missing implementation from broken schema."""
+
+
+# Canonical lab registry: canonical_id -> (module_path, display_name)
+# Add entries here as labs are implemented. Aliases map to canonical IDs.
+_LABS: dict[str, tuple[str, str]] = {
+    "8.4": (
+        "labs.paper8_adversarial_horizon.phenomena_recursive_immunity",
+        "phenomena_recursive_immunity",
+    ),
+}
+# Alias -> canonical_id. run_labs(lab=None) iterates _LABS only (no duplicates).
+_LAB_ALIASES: dict[str, str] = {
+    "recursive_immunity": "8.4",
+}
+
+
+def _resolve_lab_id(key: str) -> str:
+    """Return canonical lab ID, resolving aliases. Raises KeyError if unknown."""
+    if key in _LABS:
+        return key
+    if key in _LAB_ALIASES:
+        return _LAB_ALIASES[key]
+    available = list(_LABS) + list(_LAB_ALIASES)
+    raise KeyError(f"Unknown lab '{key}'. Available: {available}")
+
+
+def _lab_result_from_raw(lab_id: str, lab_name: str, raw: object) -> LabResult:
     """Coerce mod.run() output into a typed LabResult.
 
     Extracts known fields from the raw dict; unknown keys are preserved
-    in LabResult.raw. Raises TypeError if raw is not a dict.
+    in LabResult.raw. Raises LabSchemaError if raw is not a dict, so
+    callers can distinguish a broken lab schema from a missing lab.
     """
     if not isinstance(raw, dict):
-        raise TypeError(
+        raise LabSchemaError(
             f"Lab '{lab_id}' run() must return dict, got {type(raw).__name__}"
         )
     curves = raw.get("curves", [])
@@ -564,17 +595,25 @@ def run_labs(
     Parameters
     ----------
     lab : str, optional
-        One of: "8.4", "recursive_immunity". If None, runs all
-        implemented labs.
+        Canonical lab ID ("8.4") or alias ("recursive_immunity").
+        If None, runs all implemented labs (canonical IDs only).
     plot : bool, optional
         Whether to produce matplotlib output. Default False (CI-safe).
 
     Returns
     -------
     dict[str, LabResult] or None
-        Keys are lab identifiers (e.g. "8.4"). Values are typed
-        LabResult objects with named fields for each channel's output.
-        Returns None if no labs ran successfully.
+        Keys are *canonical* lab IDs (e.g. "8.4") regardless of whether
+        an alias was passed. Returns None if no labs ran successfully.
+
+    Raises
+    ------
+    KeyError
+        If ``lab`` is not a known canonical ID or alias.
+    LabSchemaError
+        If a lab's run() returns a value that cannot be coerced into a
+        LabResult (broken schema). Distinct from ImportError so callers
+        can tell the difference between a missing lab and a broken one.
 
     Notes
     -----
@@ -582,48 +621,34 @@ def run_labs(
     The two-channel incommensurability claim (E_content / E_suppression)
     is enforced in the LabResult schema: they are separate named fields
     and are never summed into a single scalar.
+
+    Aliasing: ``run_labs(lab='recursive_immunity')`` and
+    ``run_labs(lab='8.4')`` both return ``{'8.4': LabResult(...)}``. Use
+    canonical keys when indexing the result.
     """
     import importlib
 
-    # canonical lab_id -> (module_path, display_name)
-    implemented: dict[str, tuple[str, str]] = {
-        "8.4": (
-            "labs.paper8_adversarial_horizon.phenomena_recursive_immunity",
-            "phenomena_recursive_immunity",
-        ),
-        "recursive_immunity": (
-            "labs.paper8_adversarial_horizon.phenomena_recursive_immunity",
-            "phenomena_recursive_immunity",
-        ),
-    }
+    # Resolve targets to canonical IDs (deduplicates aliases automatically).
+    if lab is None:
+        canonical_targets = list(_LABS)
+    else:
+        canonical_targets = [_resolve_lab_id(lab)]  # raises KeyError if unknown
 
-    targets = list(implemented.keys()) if lab is None else [lab]
-    seen: set[str] = set()
     results: dict[str, LabResult] = {}
 
-    for key in targets:
-        if key not in implemented:
-            print(
-                f"[mbd.paper8] Lab '{key}' not in implemented labs. "
-                f"Available: {list(implemented.keys())}"
-            )
-            continue
-        mod_path, lab_name = implemented[key]
-        if mod_path in seen:
-            continue
-        seen.add(mod_path)
-
+    for canonical_id in canonical_targets:
+        mod_path, lab_name = _LABS[canonical_id]
         try:
             mod = importlib.import_module(mod_path)
             raw = mod.run()
-            lab_result = _lab_result_from_raw(key, lab_name, raw)
+            lab_result = _lab_result_from_raw(canonical_id, lab_name, raw)
             if plot and hasattr(mod, "plot"):
                 mod.plot(raw)
-            results[key] = lab_result
+            results[canonical_id] = lab_result
         except ImportError as exc:
             print(f"[mbd.paper8] Could not import {mod_path}: {exc}")
-        except TypeError as exc:
-            print(f"[mbd.paper8] Lab '{key}' returned invalid schema: {exc}")
+        # LabSchemaError propagates — caller can distinguish broken schema
+        # from a missing/unimplemented lab.
 
     return results if results else None
 
@@ -666,7 +691,6 @@ def _print_vectors() -> None:
 
 if __name__ == "__main__":
     import sys
-    import io
 
     # Ensure Unicode math symbols (λ, κ, ⊂, …) survive Windows cp1252 console.
     if hasattr(sys.stdout, "reconfigure"):
