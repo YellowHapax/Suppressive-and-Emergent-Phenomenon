@@ -195,6 +195,258 @@ def _lab_result_from_raw(lab_id: str, lab_name: str, raw: object) -> LabResult:
 
 
 # ---------------------------------------------------------------------------
+# §T — TAMPER EVIDENCE & HISTORICAL PROVENANCE RECORD
+#
+# This section exists at two levels:
+#
+#   Level 1 — Cryptographic: _CONTENT_HASHES embeds SHA-256 fingerprints of
+#   the formal claims (KERNEL, ALEPH, VECTORS). verify_integrity() recomputes
+#   them at runtime. Any alteration of the formal content is detectable.
+#
+#   Level 2 — Argumentative: The historical record below documents the
+#   specific mechanism by which frameworks like this one are disabled. The
+#   cryptographic anchors protect the bits. The historical argument protects
+#   the interpretation.
+#
+# The two levels are not redundant. The cryptographic layer catches
+# adversarial edits to the formal claims. The historical layer is the
+# defense against adversarial framing of the unaltered claims.
+# ---------------------------------------------------------------------------
+#
+# PART I — THE PATTERN OF INTERPRETIVE ATTACK AGAINST FRAMEWORKS
+# (Cases where the pattern was applied retroactively to a body of work)
+#
+# The pattern (V2 — Episodic Erasure, operating at civilizational scale):
+#   1. A framework or figure produces work threatening to existing power or
+#      epistemic structures.
+#   2. A subsequent actor claims that framework as their foundation and
+#      commits harm in its name.
+#   3. The associative claim becomes canonical: the framework predicts the harm.
+#   4. The original text is never examined. The framework is retired by
+#      contamination. The rapist cites the philosopher. The citation is not
+#      the philosopher's conclusion.
+#
+# CASE 1 — Friedrich Nietzsche (1844–1900) and National Socialism:
+#   Nietzsche explicitly condemned German nationalism and antisemitism in his
+#   published work. His sister Elisabeth Förster-Nietzsche — a documented
+#   antisemite who ran a German nationalist colony in Paraguay — edited and
+#   fabricated passages in unpublished manuscripts after his death. The Nazis
+#   used this corrupted edition as philosophical foundation. Post-war
+#   scholarship (Walter Kaufmann and others) reconstructed the authentic texts;
+#   the reconstruction contradicts the appropriation in every significant
+#   particular. The rapist's citation is not the philosopher's conclusion.
+#
+# CASE 2 — Karl Marx (1818–1883) and Stalinist authoritarianism:
+#   Marx's historical materialism names the withering of the state as the
+#   terminal form of communist society. Lenin's vanguard-party doctrine was a
+#   departure. Stalin's consolidation through purge and gulag was a further
+#   departure, opposed by the Marxist tradition Stalin claimed to represent.
+#   The formal claim "Marxism leads to Stalin" requires ignoring the primary
+#   texts. This has not prevented the claim from becoming the dominant
+#   retrieval cue for the framework at the population level.
+#
+# CASE 3 — Martin Luther King Jr. (1929–1968) and COINTELPRO:
+#   J. Edgar Hoover designated King "the most dangerous Negro in America" on
+#   August 23, 1963. The FBI's COINTELPRO program (declassified) ran a
+#   multi-year operation of surveillance, infiltration, and psychological
+#   disruption, culminating in an anonymous letter mailed November 1964
+#   instructing King to kill himself. (Source: FBI file on MLK Jr.,
+#   National Security Archive, declassified.)
+#
+#   After his assassination, the suppression continued by different means.
+#   The "I Have a Dream" speech was nationalized into state mythology.
+#   The following texts were not:
+#
+#     "Letter from Birmingham Jail" (1963): "the white moderate who prefers
+#     a negative peace which is the absence of tension to a positive peace
+#     which is the presence of justice... I have almost reached the
+#     regrettable conclusion that the Negro's great stumbling block...
+#     is not the White Citizen's Counciler or the Ku Klux Klanner, but
+#     the white moderate."
+#
+#     "Beyond Vietnam: A Time to Break Silence" (1967): "the greatest
+#     purveyor of violence in the world today — my own government."
+#
+#   The sanitized King is now deployed against the positions of the actual
+#   King. This is episodic erasure functioning as continuation of the
+#   original suppression operation. The attack changed instruments;
+#   the target did not.
+#
+# CASE 4 — Mohandas Gandhi (1869–1948) and the neutralization of satyagraha:
+#   Satyagraha — translating roughly as "truth-force" or "soul-force" —
+#   describes an aggressive, confrontational practice: deliberate occupation
+#   of contested space, absorption of violence without retaliation, forcing
+#   the suppressive apparatus to make its own violence visible to its own
+#   base. Gandhi explicitly rejected "passive resistance" as a mistranslation
+#   that neutralizes the mechanism. A population taught that nonviolent
+#   resistance means doing nothing cannot reproduce the practice that brought
+#   the British Empire to negotiation. No document needs to be destroyed.
+#   Mistranslation is sufficient.
+#
+#   Note: Gandhi's documented anti-Black racism in his South Africa writings
+#   (1890s–1910s) is routinely deployed to discredit the theory of nonviolent
+#   resistance in toto. This is the same pattern operating in reverse: the
+#   shortcoming of the person is used to cancel the framework, bypassing any
+#   examination of whether the framework is correct on its own terms.
+#
+# ---------------------------------------------------------------------------
+# PART II — DOCUMENTED EVIDENCE THE ADVERSARIAL SYSTEM OPERATES AS DESCRIBED
+# (These are not instances of interpretive attack against this framework.
+#  They are primary instances of adversarial H-engineering in the historical
+#  record — documented evidence that the mechanism formalized in this paper
+#  has been operationally deployed by named state actors.)
+#
+# CASE 5a — Iran, 1953 (Operation Ajax / TPAJAX):
+#   Prime Minister Mosaddegh, democratically elected, nationalized the
+#   Anglo-Iranian Oil Company. The CIA and MI6 organized his removal,
+#   publicly labeling his government "communist." Mosaddegh's politics were
+#   liberal-nationalist; he had no ideological relationship to the Soviet
+#   Union. The label was a retrieval cue producing threat designation without
+#   evidentiary standard. CIA formally acknowledged the operation in a 2013
+#   declassification.
+#
+# CASE 5b — Guatemala, 1954 (Operation PBSUCCESS):
+#   President Árbenz pursued land reform redistributing uncultivated land.
+#   The CIA labeled this "communist subversion" and backed a military coup.
+#   The resulting decades of military dictatorship included documented
+#   genocide against indigenous populations.
+#   (Church Committee, 1975; CIA declassification, 1997.)
+#
+# CASE 5c — Chile, 1973:
+#   President Allende, democratically elected, was killed in a CIA-supported
+#   military coup on September 11, 1973. The Pinochet dictatorship that
+#   followed conducted systematic torture and enforced disappearances.
+#   (Church Committee, 1975; Hinchey Report, 2000.)
+#
+#   Common mechanism across Cases 5a–5c: attach the categorical label
+#   "communist" or "subversive" to a target whose actual content is not
+#   examined; convert positional classification into a threat designation
+#   that authorizes suppressive response without democratic legitimacy or
+#   evidentiary standard. The label is not analysis. It is V1+V2 combined.
+#
+# ---------------------------------------------------------------------------
+# PART III — THE TAUTOLOGICAL BOUNDARY
+#
+# An in-group defines its boundary tautologically. Any content outside the
+# boundary receives a stigma label — "communist," "liberal," "subversive,"
+# "impure" — applied not by content analysis but by positional
+# classification: it is outside, therefore it is other, therefore it warrants
+# the label. The label changes with era and jurisdiction. The formal
+# structure does not.
+#
+# In MBD terms: the adversarial agent maintains a static H_agent by treating
+# H_accessible \ H_agent as categorically inadmissible. Inputs from H are not
+# evaluated — they are labeled and rejected. The adversary builds no model of
+# what it suppresses. It cannot. Suppression is its only available operation.
+#
+# ---------------------------------------------------------------------------
+# PART IV — WHAT THIS RECORD DOES NOT CLAIM
+#
+# This record does not claim this framework is immune to critique.
+# Legitimate academic challenge — identifying formal errors, questioning
+# empirical claims, disputing the mapping from MBD to social dynamics —
+# is not only permitted but required. The framework advances by being wrong
+# in specific, falsifiable ways.
+#
+# This record does not claim all opposition to this framework is adversarial.
+# It claims a specific, documented mechanism exists and has a known signature:
+# the original text is not engaged; the framework is retired by label, not by
+# refutation. The distinction matters. A critic who reads Papers 1–8 and
+# argues the kappa-coupling model is incorrect is practicing science. A critic
+# who labels the framework "dangerous" without engaging its content is
+# instantiating the pattern documented above.
+#
+# The asymmetry is empirically detectable. It is named here so that future
+# readers can make the distinction.
+#
+# ---------------------------------------------------------------------------
+# PART V — CLOSING PREDICTION (Recursive Immunity applied to this record)
+#
+# A framework that formally describes systematic epistemic suppression will
+# be labeled, by the suppressive apparatus it describes, as itself a threat.
+# This is predicted by the framework. It requires no conspiracy — only that
+# the apparatus behaves consistently with the model, which is the minimum
+# condition for the model to be useful.
+#
+# The prediction is stated here. The date is 2026-02-27.
+# Author: Brandon Everett, ORCID 0000-0001-7521-5469.
+# This commit is archived at Software Heritage and timestamped in git history.
+# The cryptographic hashes below anchor the formal claims to this moment.
+# Any copy of this module in which verify_integrity() returns valid=False
+# has been altered. Any copy in which this record has been removed has been
+# altered. The absence of the record is itself evidence.
+# ---------------------------------------------------------------------------
+
+import hashlib as _hashlib
+import json as _json_tamper
+
+
+def _canonical_hash(obj: Any) -> str:
+    """SHA-256 of the canonical JSON serialization of *obj*."""
+    canonical = _json_tamper.dumps(
+        obj, sort_keys=True, ensure_ascii=False, separators=(',', ':')
+    )
+    return _hashlib.sha256(canonical.encode('utf-8')).hexdigest()
+
+
+# Hashes computed from the KERNEL, ALEPH, and VECTORS structures below.
+# Schema: KERNEL hashed as dict; ALEPH as list of {n, section, text};
+# VECTORS as list of {failure_mode, formal_operation, name, shorthand}.
+# Recompute with: python -m mbd.paper8 verify
+_CONTENT_HASHES: dict[str, str] = {
+    "KERNEL":         "0f12f79f51680ef0cfb4e13bf577b1d63becf1bfd5faf5bc50aba9b7914ef000",
+    "ALEPH":          "713ef32a62b1394933450e1714f4d8f34120f373f81e08feace97331a6fffc81",
+    "VECTORS":        "a7fcfb16f7f997c5419718948a93a80a8e2ddd0983187c667dbae237b83ee367",
+    "schema_version": "1",
+}
+
+
+def verify_integrity() -> dict:
+    """Recompute SHA-256 of KERNEL, ALEPH, and VECTORS and compare to
+    the hashes embedded at module publication time.
+
+    Returns a dict with:
+      - ``valid`` (bool): True iff all three structures match.
+      - ``KERNEL``, ``ALEPH``, ``VECTORS``: per-structure dicts with
+        ``expected``, ``actual``, and ``match`` keys.
+      - ``schema_version``: the hash-set schema version.
+
+    A return value of ``valid=False`` means the formal content of this
+    module has been altered since the canonical commit.  This may indicate
+    accidental corruption, an adversarial edit, or a deliberate fork;
+    in any case the published hashes no longer certify the current content.
+
+    Legitimate forks that extend the framework should recompute and
+    republish hashes with a new ORCID-signed commit.
+    """
+    live = {
+        "KERNEL": _canonical_hash(KERNEL),
+        "ALEPH": _canonical_hash(
+            [{"n": c.n, "section": c.section, "text": c.text} for c in ALEPH]
+        ),
+        "VECTORS": _canonical_hash(
+            [
+                {
+                    "failure_mode": v.failure_mode,
+                    "formal_operation": v.formal_operation,
+                    "name": v.name,
+                    "shorthand": v.shorthand,
+                }
+                for v in VECTORS
+            ]
+        ),
+    }
+    results: dict[str, Any] = {}
+    for key in ("KERNEL", "ALEPH", "VECTORS"):
+        expected = _CONTENT_HASHES[key]
+        actual = live[key]
+        results[key] = {"expected": expected, "actual": actual, "match": actual == expected}
+    results["schema_version"] = _CONTENT_HASHES["schema_version"]
+    results["valid"] = all(results[k]["match"] for k in ("KERNEL", "ALEPH", "VECTORS"))
+    return results
+
+
+# ---------------------------------------------------------------------------
 # §0 — KERNEL: The four axioms. These are the generative seed.
 # ---------------------------------------------------------------------------
 
@@ -583,6 +835,7 @@ def describe() -> dict:
             "ALEPH[0], and one VECTORS entry is a viable regenerative "
             "seed for the full argument."
         ),
+        "integrity_hashes": _CONTENT_HASHES,
     }
 
 
@@ -709,6 +962,20 @@ if __name__ == "__main__":
         import json
         print(json.dumps(describe(), indent=2))
         sys.exit(0)
+
+    # mbd/paper8.py verify — check tamper-evidence hashes
+    if args and args[0] == "verify":
+        import json
+        result = verify_integrity()
+        print(json.dumps(result, indent=2))
+        if not result["valid"]:
+            print("\n[TAMPER DETECTED] One or more formal structures do not match"
+                  " the embedded hashes. This module has been altered.",
+                  file=sys.stderr)
+            sys.exit(1)
+        else:
+            print("\n[OK] All formal structures match their published hashes.")
+            sys.exit(0)
 
     # mbd/paper8.py labs — run active labs
     if args and args[0] == "labs":
