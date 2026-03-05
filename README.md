@@ -1,7 +1,7 @@
 # The Suppressive and Emergent Phenomenon
 
 **Paper 8 — Memory as Baseline Deviation Series**  
-**Author:** Brandon Everett | ORCID: [0000-0001-7521-5469](https://orcid.org/0000-0001-7521-5469)  
+**Author:** Brandon Everett | ORCID: [0009-0007-6676-4897](https://orcid.org/0009-0007-6676-4897)  
 **DOI (series index):** https://doi.org/10.5281/zenodo.18652919  
 **Status:** v1.0.0 — published 2026-02-27
 

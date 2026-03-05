@@ -3,7 +3,7 @@
 **Subtitle:** $\mathcal{H}$ as a Control Surface — Adversarial Horizon Engineering and the Recursive Structure of Resistance
 
 **Author:** Brandon Everett  
-**ORCID:** 0000-0001-7521-5469  
+**ORCID:** 0009-0007-6676-4897  
 **Series:** Memory as Baseline Deviation — Computational Labs  
 **Depends on:** Paper 7 (The Endemic Baseline), Paper 4 (Coupling Asymmetry), Paper 2 (Markov Tensor)
 

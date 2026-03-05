@@ -14,7 +14,7 @@ abstract: >
 authors:
   - family-names: Everett
     given-names: Brandon
-    orcid: "https://orcid.org/0000-0001-7521-5469"
+    orcid: "https://orcid.org/0009-0007-6676-4897"
 version: "1.0.0"
 date-released: "2026-02-27"
 license: Apache-2.0
@@ -35,6 +35,6 @@ references:
     authors:
       - family-names: Everett
         given-names: Brandon
-        orcid: "https://orcid.org/0000-0001-7521-5469"
+        orcid: "https://orcid.org/0009-0007-6676-4897"
     repository-code: "https://github.com/YellowHapax/MBD-Framework"
     doi: "10.5281/zenodo.18652919"
